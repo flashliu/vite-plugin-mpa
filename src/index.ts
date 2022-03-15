@@ -5,6 +5,7 @@ import path from 'path'
 import shell from 'shelljs'
 import { getMPAIO, getHistoryReWriteRuleList, getFirstPage } from './lib/utils'
 import { name } from '../package.json'
+import * as fs from 'fs'
 
 export default function mpa(userOptions: UserOptions = {}): Plugin {
   const options = {
@@ -51,6 +52,7 @@ export default function mpa(userOptions: UserOptions = {}): Plugin {
       const root = resolvedConfig.root || process.cwd()
       const dest = (resolvedConfig.build && resolvedConfig.build.outDir) || 'dist'
       const resolve = (p: string) => path.resolve(root, p)
+      const files = fs.readdirSync(resolve(`${dest}/${options.scanDir}`))
 
       // 1. rename all xxx.html to index.html if needed
       if (options.filename !== 'index.html') {
@@ -61,7 +63,12 @@ export default function mpa(userOptions: UserOptions = {}): Plugin {
       // 2. remove all *.html at dest root
       shell.rm('-rf', resolve(`${dest}/*.html`))
       // 3. move src/pages/* to dest root
-      shell.mv(resolve(`${dest}/${options.scanDir}/*`), resolve(dest))
+      files.forEach(name => {
+        shell.mv(
+          resolve(`${dest}/${options.scanDir}/${name}/${name}.html`),
+          resolve(`${dest}/${name}`),
+        )
+      })
       // 4. remove empty src dir
       shell.rm('-rf', resolve(`${dest}/src`))
     },
