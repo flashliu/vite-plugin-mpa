@@ -65,7 +65,7 @@ export default function mpa(userOptions: UserOptions = {}): Plugin {
       // 3. move src/pages/* to dest root
       files.forEach(name => {
         shell.mv(
-          resolve(`${dest}/${options.scanDir}/${name}/${name}.html`),
+          resolve(`${dest}/${options.scanDir}/${name}/index.html`),
           resolve(`${dest}/${name}`),
         )
       })
